@@ -44,15 +44,21 @@ void service_blink(Speed state) {
  * code to support driving with motors
  */
 
-const int LEFT_MOTOR = 5;
-const int RIGHT_MOTOR = 6;
+const int LEFT_MOTOR = 12;
+const int RIGHT_MOTOR = 11;
+const int LEFT_ARM = 9
+const int RIGHT_ARM = 10
 
 Servo left_motor;
 Servo right_motor;
+Servo left_arm;
+servo right_arm;
 
-void init_motors(int left, int right) {
+void init_motors(int left, int right, int leftarm, int rightarm) {
   left_motor.attach(left);
   right_motor.attach(right);
+  left_arm.attach(leftarm);
+  right_arm.attach(rightarm);
 }
 
 #define  FORWARD 1
