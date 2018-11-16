@@ -17,11 +17,33 @@ enum Speed { SLOW, FAST, HYPER, SPEED_ARRAY_SIZE};
 Speed speed_state = HYPER;
 
 int speed[SPEED_ARRAY_SIZE] = {LONG_BLINK, SHORT_BLINK, VERY_SHORT_BLINK};
+
+const int LEFT_MOTOR = 12;
+const int RIGHT_MOTOR = 11;
+const int LEFT_ARM = 9;
+const int RIGHT_ARM = 10;
+
+#define  FORWARD 1
+#define  REVERSE 2
+#define  LEFT    3
+#define  RIGHT   4
+#define  BACK    5
+#define  STOP    6
+
+int current_direction = FORWARD;
+
+
+Servo left_motor;
+Servo right_motor;
+Servo left_arm;
+Servo right_arm;
+
+
 void init_blink() {
   pinMode(LED_BUILTIN, OUTPUT);
 }
 
-void service_blink(Speed state) {
+void service_blink(int state) {
   static bool lightOn = false;
   static long state_start_time = 0;
   long current_time = millis();
@@ -43,32 +65,12 @@ void service_blink(Speed state) {
 /* 
  * code to support driving with motors
  */
-
-const int LEFT_MOTOR = 12;
-const int RIGHT_MOTOR = 11;
-const int LEFT_ARM = 9
-const int RIGHT_ARM = 10
-
-Servo left_motor;
-Servo right_motor;
-Servo left_arm;
-servo right_arm;
-
 void init_motors(int left, int right, int leftarm, int rightarm) {
   left_motor.attach(left);
   right_motor.attach(right);
   left_arm.attach(leftarm);
   right_arm.attach(rightarm);
 }
-
-#define  FORWARD 1
-#define  REVERSE 2
-#define  LEFT    3
-#define  RIGHT   4
-#define  BACK    5
-#define  STOP    6
-
-int current_direction = FORWARD;
 
 void drivetrain(int dir) {
   switch(dir) {
@@ -104,44 +106,43 @@ void setup() {
   Serial.println("Interfacfing arduino with nodemcu");
   ds.init();
   init_blink();
-  init_motors(LEFT_MOTOR, RIGHT_MOTOR);
+  init_motors(LEFT_MOTOR, RIGHT_MOTOR, LEFT_ARM, RIGHT_ARM);
 }
 
 /* 
  * loop - where we get input and invoke our programs subsystems
  */
 void loop() {
-    char input = ds.readInputIfAvailable();
-    switch (input) {
-      case 'f':
-        speed_state = FAST;
-        break;
-      case 'g':
-        speed_state = SLOW;
-        break;
-      case 'h':
-        speed_state = HYPER;
-        break;
-      case 'w':
-        current_direction = FORWARD;
-        break;
-      case 'a':
-        current_direction = LEFT;
-        break;
-      case 'd':
-        current_direction = RIGHT;
-        break;
-      case 's':
-        current_direction = STOP;
-        break;
-      case 'x':
-        current_direction = REVERSE;
-        break;
-      default:
-        // no change to speed state if no keystroke
-        break;
-    }
-
-    service_blink(speed_state);
-    drivetrain(current_direction);
+  char input = ds.readInputIfAvailable();
+  switch (input) {
+    case 'f':
+      speed_state = FAST;
+      break;
+    case 'g':
+      speed_state = SLOW;
+      break;
+    case 'h':
+      speed_state = HYPER;
+      break;
+    case 'w':
+      current_direction = FORWARD;
+      break;
+    case 'a':
+      current_direction = LEFT;
+      break;
+    case 'd':
+      current_direction = RIGHT;
+      break;
+    case 's':
+      current_direction = STOP;
+      break;
+    case 'x':
+      current_direction = REVERSE;
+      break;
+    default:
+      // no change to speed state if no keystroke
+      break;
+  }
+  service_blink(speed_state);
+  drivetrain(current_direction);
 }
